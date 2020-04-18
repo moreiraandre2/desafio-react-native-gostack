@@ -19,25 +19,17 @@ export default function App() {
     api.get('/repositories').then(response => {
       setRepositories(response.data); 
     });
-  },[repositories]);
+  },[]);
 
   async function handleLikeRepository(id) {
-    await api.post(`/repositories/${id}/like`).then(response => {
-      setRepositories([...repositories]);
-    });
-  }
+    const response = await api.post(`/repositories/${id}/like`);
+    
+    const repositoryLiked = response.data;
 
-  function listTechs(techs){
-    return(
-        techs.map(tech => (
-          <View style={styles.techsContainer} key={tech}>
-              <Text style={styles.tech}>
-                {tech}
-              </Text>
-            </View>
-        ))
-      );
-  } 
+    const repositoriesUpdate = repositories.map(repository => repository.id === id?repositoryLiked:repository);
+
+    setRepositories(repositoriesUpdate)
+  }
 
   return (
     <>
@@ -50,7 +42,13 @@ export default function App() {
             <View style={styles.repositoryContainer}>
           <Text style={styles.repository}>{item.title}</Text>
 
-          {listTechs(item.techs)}
+          {item.techs.map(tech => (
+            <View style={styles.techsContainer} key={tech}>
+              <Text style={styles.tech}>
+                {tech}
+              </Text>
+            </View>
+          ))}
           
           <View style={styles.likesContainer}>
             <Text
